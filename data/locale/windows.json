@@ -1,0 +1,571 @@
+<?php
+	
+$locale	=	Array(
+						'Afrikaans'		=>	Array(
+														Array(
+																'charset'	=>	'af_utf8',
+																'value'		=>	'af_ZA.UTF-8',
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Afrikaans_South Africa.1252'
+														)
+						),
+						'Albanian'		=>	Array(
+														Array(
+																'charset'	=>	'sq_utf8',
+																'value'		=>	'sq_AL.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250',
+																'value'		=>	'Albanian_Albania.1250'
+														)
+						),
+						'Arabic'		=>	Array(
+														Array(
+																'charset'	=>	'ar_utf8',
+																'value'		=>	'ar_SA.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1256',
+																'value'		=>	'Arabic_Saudi Arabia.1256'
+														)
+						),
+						'Basque'		=>	Array(
+														Array(
+																'charset'	=>	'eu_utf8',
+																'value'		=>	'eu_ES.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Basque_Spain.1252'
+														)
+						),
+						'Belarusian'		=>	Array(
+														Array(
+																'charset'	=>	'be_utf8',
+																'value'		=>	'be_BY.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1251',
+																'value'		=>	'Belarusian_Belarus.1251'
+														)
+						),
+						'Bosnian'		=>	Array(
+														Array(
+																'charset'	=>	'bs_utf8',
+																'value'		=>	'bs_BA.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250',
+																'value'		=>	'Serbian (Latin)'
+														)
+						),
+						'Bulgarian'		=>	Array(
+														Array(
+																'charset'	=>	'bg_utf8',
+																'value'		=>	'bg_BG.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1251',
+																'value'		=>	'Bulgarian_Bulgaria.1251'
+														)
+						),
+						'Catalan'		=>	Array(
+														Array(
+																'charset'	=>	'ca_utf8',
+																'value'		=>	'ca_ES.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Catalan_Spain.1252'
+														)
+						),
+						'Croatian'		=>	Array(
+														Array(
+																'charset'	=>	'hr_utf8',
+																'value'		=>	'hr_HR.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250',
+																'value'		=>	'Croatian_Croatia.1250'
+														)
+						),
+						'Chinese '		=>	Array(
+														Array(
+																'charset'	=>	'zh_cn_utf8',
+																'value'		=>	'zh_CN.UTF-8',
+																'variant'	=>	'simplified'
+														),
+														Array(
+																'charset'	=>	'CP936',
+																'value'		=>	'Chinese_China.936',
+																'variant'	=>	'simplified'
+														),						
+														Array(
+																'charset'	=>	'zh_tw_utf8',
+																'value'		=>	'zh_TW.UTF-8',
+																'variant'	=>	'traditional'
+														),
+														Array(
+																'charset'	=>	'CP950',
+																'value'		=>	'Chinese_Taiwan.950',
+																'variant'	=>	'traditional'
+														)
+						),
+						'Czech'		=>	Array(
+														Array(
+																'charset'	=>	'cs_utf8',
+																'value'		=>	'cs_CZ.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250',
+																'value'		=>	'Czech_Czech Republic.1250'
+														)
+						),
+						'Danish'		=>	Array(
+														Array(
+																'charset'	=>	'da_utf8',
+																'value'		=>	'da_DK.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Danish_Denmark.1252'
+														)
+						),
+						'Dutch'		=>	Array(
+														Array(
+																'charset'	=>	'nl_utf8',
+																'value'		=>	'nl_NL.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Dutch_Netherlands.1252'
+														)
+						),
+						'English'		=>	Array(
+														Array(
+																'charset'	=>	'en_utf8',
+																'value'		=>	'en.UTF-8'
+														),
+														Array(
+																//'charset'	=>	'', acá no sé qué hacer
+																'value'		=>	'English_Australia.1252'
+														),
+														Array(
+																'charset'	=>	'en_us_utf8',
+																'value'		=>	'en.UTF-8',
+																'variant'	=>	'US';
+														)
+						),
+						'Estonian'		=>	Array(
+														Array(
+																'charset'	=>	'et_utf8',
+																'value'		=>	'et_EE.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1257',
+																'value'		=>	'Estonian_Estonia.1257'
+														)
+						),
+						'Farsi'		=>	Array(
+														Array(
+																'charset'	=>	'fa_utf8',
+																'value'		=>	'fa_IR.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1256',
+																'value'		=>	'Farsi_Iran.1256'
+														)
+						),
+						'Filipino'		=>	Array(
+														Array(
+																'charset'	=>	'fil_utf8',
+																'value'		=>	'ph_PH.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Filipino_Philippines.1252'
+														)
+						),
+						'Finnish'		=>	Array(
+														Array(
+																'charset'	=>	'fi_utf8',
+																'value'		=>	'fi_FI.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Finnish_Finland.1252'
+														)
+						),
+						'French'		=>	Array(
+														Array(
+																'charset'	=>	'fr_utf8',
+																'value'		=>	'fr_FR.UTF-8' //  or				fr_CH.UTF-8 or				fr_BE.UTF-8		fr_utf8 used-
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'French_France.1252'
+														),
+														Array(
+																'charset'	=>	'fr_ca_utf8',
+																'value'		=>	'fr_CA.UTF-8',
+																'variant'	=>	'Canada'
+														),
+														Array(
+																'charset'	=>	'fr_ca_utf8',
+																'value'		=>	'French_Canada.1252',
+																'variant'	=>	'Canada'
+														)
+						),
+						'Gaelic'		=>	Array(
+														Array(
+																'charset'	=>	'ga_utf8',
+																'value'		=>	'ga.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Gaelic_Scottish'
+														)
+						),
+						'Gallego'		=>	Array(
+														Array(
+																'charset'	=>	'gl_utf8',
+																'value'		=>	'gl_ES.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'Galician_Spain.1252'
+														)
+						),
+						'Georgian'		=>	Array(
+														Array(
+																'charset'	=>	'ka_utf8',
+																'value'		=>	'ka_GE.UTF-8'
+														),
+														Array(
+																'charset'	=>	'',	// figura vacío, va así? -empty string-
+																'value'		=>	'Georgian_Georgia.65001'
+														)
+						),
+						'German'		=>	Array(
+														Array(
+																'charset'	=>	'de_utf8',
+																'value'		=>	'de_DE.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'German_Germany.1252'
+														),
+														Array(
+																'charset'	=>	'de_du_utf8',
+																'value'		=>	'de_DE.UTF-8',
+																'variant'	=>	'Personal'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252',
+																'value'		=>	'German_Germany.1252',
+																'variant'	=>	'Personal'
+														)
+						),
+						'Greek'		=>	Array(
+														Array(
+																'charset'	=>	'el_utf8',
+																'value'		=>	'el_GR.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1253',
+																'value'		=>	'Greek_Greece.1253'
+														)
+						),
+						'Gujarati'		=>	Array(
+														Array(
+																'charset'	=>	'gu_utf8',
+																'value'		=>	'gu.UTF-8'
+														),
+														Array(
+																'charset'	=>	'',  // va vacía?
+																'value'		=>	'Gujarati_India.0'
+														)
+						),
+						'Hebrew'		=>	Array(
+														Array(
+																'charset'	=>	'he_utf8',
+																'value'		=>	'he_IL.utf8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1255', 
+																'value'		=>	'Hebrew_Israel.1255'
+														)
+						),
+						'Hindi'		=>	Array(
+														Array(
+																'charset'	=>	'hi_utf8',
+																'value'		=>	'hi_IN.UTF-8'
+														),
+														Array(
+																'charset'	=>	'', // -empty string- 
+																'value'		=>	'Hindi.65001'
+														)
+						),
+						'Hungarian'		=>	Array(
+														Array(
+																'charset'	=>	'hu_utf8',
+																'value'		=>	'hu.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250', 
+																'value'		=>	'Hungarian_Hungary.1250'
+														)
+						),
+						'Icelandic'		=>	Array(
+														Array(
+																'charset'	=>	'is_utf8',
+																'value'		=>	'is_IS.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Icelandic_Iceland.1252'
+														)
+						),
+						'Indonesian'		=>	Array(
+														Array(
+																'charset'	=>	'id_utf8',
+																'value'		=>	'id_ID.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Indonesian_indonesia.1252'
+														)
+						),
+						'Italian'		=>	Array(
+														Array(
+																'charset'	=>	'it_utf8',
+																'value'		=>	'it_IT.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Italian_Italy.1252'
+														)
+						),
+						'Japanese'		=>	Array(
+														Array(
+																'charset'	=>	'ja_utf8',
+																'value'		=>	'ja_JP.UTF-8'
+														),
+														Array(
+																'charset'	=>	'CP932', 
+																'value'		=>	'Japanese_Japan.932'
+														)
+						),
+						'Kannada'		=>	Array(
+														Array(
+																'charset'	=>	'kn_utf8',
+																'value'		=>	'kn_IN.UTF-8'
+														),
+														Array(
+																'charset'	=>	'', // -empty string-
+																'value'		=>	'Kannada.65001'
+														)
+						),
+						'Khmer'		=>	Array(
+														Array(
+																'charset'	=>	'km_utf8',
+																'value'		=>	'km_KH.UTF-8'
+														),
+														Array(
+																'charset'	=>	'',  // -empty string-
+																'value'		=>	'Khmer.65001'
+														)
+						),
+						'Korean'		=>	Array(
+														Array(
+																'charset'	=>	'ko_utf8',
+																'value'		=>	'ko_KR.UTF-8'
+														),
+														Array(
+																'charset'	=>	'EUC-KR', 
+																'value'		=>	'Korean_Korea.949'
+														)
+						),
+						'Lao'		=>	Array(
+														Array(
+																'charset'	=>	'lo_utf8',
+																'value'		=>	'lo_LA.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1257', 
+																'value'		=>	'Lao_Laos.UTF-8'
+														)
+						),
+						'Lithuanian'		=>	Array(
+														Array(
+																'charset'	=>	'lt_utf8',
+																'value'		=>	'lt_LT.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1257', 
+																'value'		=>	'Lithuanian_Lithuania.1257'
+														)
+						),				
+						'Latvian'		=>	Array(
+														Array(
+																'charset'	=>	'lv_utf8',
+																'value'		=>	'lat.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1257', 
+																'value'		=>	'Latvian_Latvia.1257'
+														)
+						),
+						'Malayalam'		=>	Array(
+														Array(
+																'charset'	=>	'ml_utf8',
+																'value'		=>	'ml_IN.UTF-8'
+														),
+														Array(
+																'charset'	=>	'x-iscii-ma', 
+																'value'		=>	'Malayalam_India.x-iscii-ma'
+														)
+						),
+						'Malaysian'		=>	Array(
+														Array(
+																'charset'	=>	'ms_utf8',
+																'value'		=>	'ms_MY.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Malay_malaysia.1252'
+														)
+						),
+						'Maori'		=>	Array(
+														Array(
+																'charset'	=>	'mi_tn_utf8',
+																'value'		=>	'mi_NZ.UTF-8',
+																'variant'	=>	'Ngai Tahu'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Maori.1252',
+																'variant'	=>	'Ngai Tahu'
+														),
+														Array(
+																'charset'	=>	'mi_wwow_utf8',
+																'value'		=>	'mi_NZ.UTF-8',
+																'variant'	=>	'Waikoto Uni'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Maori.1252',
+																'variant'	=>	'Waikoto Uni'
+														)
+						),
+						'Mongolian'		=>	Array(
+														Array(
+																'charset'	=>	'mn_utf8',
+																'value'		=>	'mn.UTF-8'
+														),
+														Array(
+																'charset'	=>	'', // vacío 
+																'value'		=>	'Cyrillic_Mongolian.1251'
+														)
+						),
+						'Norwegian'		=>	Array(
+														Array(
+																'charset'	=>	'no_utf8',
+																'value'		=>	'no_NO.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Norwegian_Norway.1252'
+														),
+														Array(
+																'charset'	=>	'no_gr_utf8',
+																'value'		=>	'no_NO.UTF-8',
+																'variant'	=>	'Primary'
+														),
+														Array(
+																'charset'	=>	'',  // -parent no_utf8 used-  ?? qué va acá??
+																'value'		=>	'', //-parent no_utf8 used-
+																'variant'	=>	'Primary'
+														)
+						),
+						'Nynorsk'		=>	Array(
+														Array(
+																'charset'	=>	'nn_utf8',
+																'value'		=>	'nn_NO.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Norwegian-Nynorsk_Norway.1252'
+														)
+						),
+						'Polish'		=>	Array(
+														Array(
+																'charset'	=>	'pl_utf8',
+																'value'		=>	'pl.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250', 
+																'value'		=>	'Polish_Poland.1250'
+														)
+						),
+						'Portuguese'		=>	Array(
+														Array(
+																'charset'	=>	'pt_utf8',
+																'value'		=>	'pt_PT.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Portuguese_Portugal.1252'
+														),
+														Array(
+																'charset'	=>	'pt_br_utf8',
+																'value'		=>	'pt_BR.UTF-8',
+																'variant'	=>	'Brazil'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1252', 
+																'value'		=>	'Portuguese_Brazil.1252',
+																'variant'	=>	'Brazil'
+														)
+						),
+						'Romanian'		=>	Array(
+														Array(
+																'charset'	=>	'ro_utf8',
+																'value'		=>	'ro_RO.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1250', 
+																'value'		=>	'Romanian_Romania.1250'
+														)
+						),
+						'Russian'		=>	Array(
+														Array(
+																'charset'	=>	'ru_utf8',
+																'value'		=>	'ru_RU.UTF-8'
+														),
+														Array(
+																'charset'	=>	'WINDOWS-1251', 
+																'value'		=>	'Russian_Russia.1251'
+														)
+						),
+
+
+sm_utf8	Samoan	mi_NZ.UTF-8	Maori.1252	WINDOWS-1252
+sr_utf8	Serbian	sr_CS.UTF-8	Serbian (Cyrillic)_Serbia and Montenegro.1251	WINDOWS-1251
+sk_utf8	Slovak	sk_SK.UTF-8	Slovak_Slovakia.1250	WINDOWS-1250
+sl_utf8	Slovenian	sl_SI.UTF-8	Slovenian_Slovenia.1250	WINDOWS-1250
+so_utf8	Somali	so_SO.UTF-8	not found!	not found!
+es_utf8	Spanish (International)	es_ES.UTF-8	Spanish_Spain.1252	WINDOWS-1252
+sv_utf8	Swedish	sv_SE.UTF-8	Swedish_Sweden.1252	WINDOWS-1252
+tl_utf8	Tagalog	tl.UTF-8	not found!	not found!
+ta_utf8	Tamil	ta_IN.UTF-8	English_Australia.1252	
+th_utf8	Thai	th_TH.UTF-8	Thai_Thailand.874	WINDOWS-874
+to_utf8	Tongan	mi_NZ.UTF-8'	Maori.1252	WINDOWS-1252
+tr_utf8	Turkish	tr_TR.UTF-8	Turkish_Turkey.1254	WINDOWS-1254
+uk_utf8	Ukrainian	uk_UA.UTF-8	Ukrainian_Ukraine.1251	WINDOWS-1251
+vi_utf8	Vietnamese	vi_VN.UTF-8	Vietnamese_Viet Nam.1258	WINDOWS-1258
+
+
+?>
