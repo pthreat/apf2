@@ -4,29 +4,26 @@
 
 	use apf\type\base\StrDisk;
 	use apf\type\util\common\Variable	as	VarUtil;
+	use apf\core\Log;
 
-	$string	=	'あaaa';
-	file_put_contents('/tmp/test',$string);
-	$fp	=	fopen('/tmp/test','r');
-	echo fread($fp,4);
-	fclose($fp);
+	$log		=	new Log();
+
+	$string	=	'aあ こんにちはaaakanaa';
+	$log->info("Base string: $string");
 	$str		=	new StrDisk($string);
-	echo $str."\n";
-	var_dump($str[0]);
-	die();
+	$log->info("Length: %d",$str->strlen());
+	$log->info("Iterate through disk string");
 
-	foreach($str as $s){
-		echo $s."\n";
+	foreach($str as $key=>$s){
+
+		echo $key.'=>'.$s."\n";
+
 	}
 
-	echo $str."\n";
-	die();
+	$log->info("String check: $str");
+	$log->info("Replace offset 1: $str[1] with character 'b'");
 
-	$test		=	new \SPLFileObject('/tmp/test');
-	$handler	=	$test->openFile('w');
-	$handler->fwrite('123');
-	$handler->fseek(0);
-	$handler->fwrite(4);
+	$str[1]	=	'b';
 
-	unset($test);
-	echo file_get_contents('/tmp/test')."\n";
+	$log->info("Modified string: $str");
+

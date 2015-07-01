@@ -14,7 +14,10 @@
 
 		class StrDisk extends Type implements \ArrayAccess,\Iterator{
 
-			private	$file	=	NULL;
+			private	$file			=	NULL;
+			private	$rHandler	=	NULL;
+			private	$curChar		=	NULL;
+			private	$position	=	0;
 
 			public function __construct($string,$parameters=NULL){
 
@@ -33,6 +36,9 @@
 				$handler->fflush();
 				clearstatcache(TRUE,$this->file);
 
+				$handler				=	$this->file->getHandler(['mode'=>'r','reopen'=>TRUE]);
+				$this->rHandler	=	$handler;
+
 			}
 
 			public static function cast($value,$parameters=NULL){
@@ -49,58 +55,57 @@
 
 			public function offsetGet($offset){
 
-				$handler	=	$this->file->getHandler(['mode'=>'c']);
-				$handler->fseek($offset);
-				return $handler->fgetc();
+				$offset	=	(int)$offset;
+				$count	=	0;
+				$this->rHandler->fseek(0);
+
+				do{
+
+					$char	=	$this->rHandler->fgetChar();
+
+				}while($count++<$offset);
+
+				if($char===FALSE){
+
+					throw new UndefinedOffsetException("Offset $offset doesn't exists");
+
+				}
+
+				return $char;
 
 			}
 
 			public function offsetSet($offset,$value){
 
-				if(is_null($offset)){
+				$offset	=	!is_null($offset) ? (int)$offset : ($this->strlen() + 1);
 
-					$offset	=	$this->strlen()+1;	
+				$file		=	new File(['tmp'=>TRUE]);
+				$handler	=	$file->getHandler(['mode'=>'w']);
+
+				foreach($this as $key=>$char){
+
+					if($key==$offset){
+
+						$char	=	CharType::cast($value);	
+
+					}
+
+					$handler->fwrite($char);
 
 				}
 
-				$handler	=	$this->file->getHandler(['mode'=>'c','reopen'=>TRUE]);
-				$handler->fseek($offset);
-				$handler->fflush();
-				$handler->fwrite(CharType::cast($value)->valueOf());
+				$this->file			=	$file;
+				$this->rHandler	=	$file->getHandler(['mode'=>'r','reopen'=>TRUE]);
+				$this->rHandler->fseek(0);
+
+				return;
 
 			}
 
-			public function current(){
+			public function offsetExists($offset){
 
-				return $this->file->getHandler(['mode'=>'r'])->fread();
+				return TRUE;
 
-			}
-
-			public function next(){
-
-				return $this->current();
-
-			}
-
-			public function rewind(){
-
-				$this->file->getHandler(['mode'=>'r'])->fseek(0);
-
-			}
-
-			public function valid(){
-
-				return !$this->file->getHandler(['mode'=>'r'])->eof();
-
-			}
-
-			public function key(){
-
-				return $this->file->getHandler(['mode'=>'r'])->ftell();
-
-			}
-
-			public function toChar(){
 			}
 
 			public function offsetUnset($offset){
@@ -126,27 +131,47 @@
 
 			}
 
-			public function offsetExists($offset){
+			public function current(){
 
-				$handler	=	$this->file->getHandler(['mode'=>'r']);
+				return $this->curChar	=	$this->rHandler->fgetChar($forwardCursor=FALSE);
 
-				if($offset>$handler->getSize()){
+			}
 
-					throw new UndefinedOffsetException("Undefined offset \"$offset\"");
+			public function next(){
 
-				}
+				return $this->curChar	=	$this->rHandler->fgetChar();
 
-				return TRUE;
+			}
 
+			public function rewind(){
+
+				$this->position	=	0;
+				return $this->rHandler->fseek(0);
+
+			}
+
+			public function valid(){
+
+				return $this->rHandler->fgetChar($forwardCursor=FALSE);
+
+			}
+
+			public function key(){
+
+				return $this->position++;
+
+			}
+
+			public function toChar(){
 			}
 
 			public function strlen(){
 
 				$count	=	0;
 
-				$handler	=	$this->file->getHandler(['mode'=>'r']);
+				$this->rHandler->fseek(0);
 
-				while(FALSE !== ($char=$handler->fgetc())){
+				while(FALSE !== ($char=$this->rHandler->fgetChar())){
 
 					$count++;
 

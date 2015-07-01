@@ -49,20 +49,31 @@
 
 			}
 
-			public function fgetc(){
+			/**
+			*fgetChar is different from fgetc due to the fact
+			*that fgetChar reads characters, not bytes as fgetc does.
+			*This allows the end user to safely go character by character,
+			*it doesn't matters if the character is a multibyte character.
+			*/
 
-				$char	=	parent::fread(2);
+			public function fgetChar($forwardCursor=TRUE){
 
-				var_dump($char);
-				die();
+				$pos			=	$this->ftell();
+				$char			=	parent::fread(32);
+				$char			=	preg_split('//u',$char,-1,\PREG_SPLIT_NO_EMPTY);
 
-				if($char===FALSE){
+				if(!sizeof($char)){
 
 					return FALSE;
 
 				}
 
-				return CharType::cast($char,['strict'=>TRUE]);
+				$size		=	sizeof($char);
+
+				$seekTo	=	$forwardCursor	?	$pos+strlen($char[0])	:	$pos;
+				$this->fseek($seekTo);
+
+				return CharType::cast($char[0],['strict'=>TRUE]);
 
 			}
 
@@ -74,7 +85,7 @@
 
 				}
 
-				while(FALSE !== ($char=$this->fgetc())){
+				while(FALSE !== ($char=$this->fgetChar())){
 
 					if($seekChar===$char->valueOf()){
 

@@ -64,6 +64,12 @@
 
 			}
 
+			public function isMultibyte(){
+
+				return strlen($this->value)>1;
+
+			}
+
 			public function toBinary($parameters=NULL){
 
 				return CharUtil::toBinary($this->value,$parameters);
