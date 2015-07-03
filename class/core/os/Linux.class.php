@@ -22,26 +22,18 @@
 
 				while(($line = $handler->fgets())!==FALSE){
 
-					$line	=	$line->keyValuePair(':');
+					if($line=="\n"){
 
-					$key	=	StringUtil::toCamelCase($line['key']);
+						$objCPU	=	(new CPU($cpu))
+						->setFlags($cpu->flags)
+						->setMhz($cpu->cpuMhz)
+						->setNumber($number)
+						->setCacheSize($cpu->cacheSize)
+						->setAmountOfCores($cpu->cpuCores)
+						->setFPU($cpu->fpu)
+						->setModel($cpu->modelName);
 
-					if(empty($key)){
-
-						if(!empty($cpu)){
-	
-							$objCPU	=	(new CPU($cpu))
-							->setFlags($cpu->flags)
-							->setMhz($cpu->cpuMhz)
-							->setNumber($number)
-							->setCacheSize($cpu->cacheSize)
-							->setAmountOfCores($cpu->cpuCores)
-							->setFPU($cpu->fpu)
-							->setModel($cpu->modelName);
-
-							$cpuCollection->add($objCPU);
-
-						}
+						$cpuCollection->add($objCPU);
 
 						$number++;
 
@@ -49,7 +41,15 @@
 
 					}
 
-					$cpu->$key	=	StringUtil::trim($line['value']);
+					$line	=	$line->keyValuePair(':');
+
+					$key	=	StringUtil::toCamelCase($line['key']);
+
+					if(!empty($key)){
+
+						$cpu->$key	=	StringUtil::trim($line['value']);
+
+					}
 
 				}
 
@@ -67,6 +67,13 @@
 				while(($line = $handler->fgets())!==FALSE){
 
 					$line	=	$line->keyValuePair(':');
+
+					if(empty($line['key'])){
+
+						continue;
+
+					}
+
 					$key	=	StringUtil::toCamelCase($line['key'],'[_\s]');
 
 					$memory->$key	=	$line['value'];

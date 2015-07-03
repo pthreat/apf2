@@ -104,19 +104,22 @@
 
 			public function offsetExists($offset){
 
-				return TRUE;
+				$offset	=	(int)$offset;
+
+				return $offset >=0 && $offset <= $this->strlen();
 
 			}
 
 			public function offsetUnset($offset){
 
-				$file			=	new File(['tmp'=>TRUE]);
-				$nhandler	=	$file->getHandler();
-				$handler		=	$this->file->getHandler();
+				$offset	=	(int)$offset;
 
-				while(FALSE!==($char=$handler->fgetc())){
+				$file		=	new File(['tmp'=>TRUE]);
+				$handler	=	$file->getHandler(['mode'=>'w']);
 
-					if($handler->ftell()==$offset){
+				foreach($this as $key=>$char){
+
+					if($key==$offset){
 
 						continue;
 
@@ -126,8 +129,11 @@
 
 				}
 
-				$this->file	=	NULL;
-				$this->file	=	$file;
+				$this->file			=	$file;
+				$this->rHandler	=	$file->getHandler(['mode'=>'r','reopen'=>TRUE]);
+				$this->rHandler->fseek(0);
+
+				return;
 
 			}
 
