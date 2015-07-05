@@ -2,6 +2,7 @@
 
 	namespace apf\io\common\file{
 
+		use apf\type\base\IntNum		as	IntType;
 		use apf\type\base\Str			as	StringType;
 		use apf\type\base\Char			as	CharType;
 		use apf\type\parser\Parameter	as	ParameterParser;
@@ -68,12 +69,59 @@
 
 				}
 
-				$size		=	sizeof($char);
-
 				$seekTo	=	$forwardCursor	?	$pos+strlen($char[0])	:	$pos;
 				$this->fseek($seekTo);
 
 				return CharType::cast($char[0],['strict'=>TRUE]);
+
+			}
+
+			public function getLength(){
+
+				$pos	=	$this->ftell();
+
+				$this->fseek(0);
+				$count	=	0;
+
+				while(FALSE !==($char=$this->fgetChar())){
+
+					$count++;
+
+				}
+
+				$this->fseek($pos);
+
+				return $count;
+
+			}
+
+			public function fseekEnd(){
+
+				$this->fseek($this->getSize());
+
+			}
+
+			public function fseekChar($charAmount=NULL){
+
+				if($charAmount<0){
+
+					$length		=	$this->getLength();
+					$charAmount	=	$length + $charAmount;
+
+				}
+
+				$this->fseek(0);
+
+				$parameters	=	ParameterParser::parse($charAmount,'amount');
+				$charAmount	=	$parameters->find('amount')->toInt()->valueOf();
+
+				for($i=0;$i<$charAmount;$i++){
+
+					$this->fgetChar();
+
+				}
+
+				return;
 
 			}
 

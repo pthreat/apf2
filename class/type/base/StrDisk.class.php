@@ -26,14 +26,17 @@
 				if($string instanceof File){
 
 					$this->file	=	$string;
-					return;
+
+				}else{
+
+					$this->file	=	new File(['tmp'=>TRUE]);
 
 				}
 
-				$this->file	=	new File(['tmp'=>TRUE]);
 				$handler		=	$this->file->getHandler(['mode'=>'w']);
 				$handler->fwrite($string);
 				$handler->fflush();
+
 				clearstatcache(TRUE,$this->file);
 
 				$handler				=	$this->file->getHandler(['mode'=>'r','reopen'=>TRUE]);
@@ -173,23 +176,19 @@
 
 			public function strlen(){
 
-				$count	=	0;
-
-				$this->rHandler->fseek(0);
-
-				while(FALSE !== ($char=$this->rHandler->fgetChar())){
-
-					$count++;
-
-				}
-
-				return $count;
+				return $this->rHandler->getLength();
 
 			}
 
+			//Your if's are many in this one young padawan
+			//but fear not ...!
+			//http://lxr.php.net/xref/PHP_5_6/ext/standard/string.c line 2240
+
 			public function substr($parameters=NULL){
 
-				$parameters		=	ParameterParser::parse($parameters,'start');
+				$pos			=	$this->rHandler->ftell();
+
+				$parameters	=	ParameterParser::parse($parameters,'start');
 				$parameters->findInsert('length',NULL);
 
 				$start	=	$parameters->find('start')->toInt()->valueOf();
@@ -201,7 +200,7 @@
 
 				}
 
-				$size			=	$this->strlen();
+				$size	=	$this->strlen();
 
 				if($start>$size){
 
@@ -209,57 +208,72 @@
 
 				}
 
-				$count	=	0;
+				if(is_null($length)){
 
-				if($start < 0){
-
-					$start	=	$size+$start;
-
-					if($start<0){
-
-						$start	=	0;
-
-					}
+					$length	=	$size;
 
 				}
-
 
 				$substr			=	new File(['tmp'=>TRUE,'ontostring'=>'contents']);
 				$substrHandler	=	$substr->getHandler(['mode'=>'w']);
-
-				$handler	=	$this->file->getHandler();
-				$handler->fseek($start);
-
-				if(!($length===NULL)){
-
-					if($length<0){
-
-						$count	=	($length*-1)+1;
-						$length	=	$length<0	?	($size-$start)+1	:	$length;
-
-					}
-
-					if($length<0){
-
-						$length	=	0;
-
-					}
-
-				}
 
 				if($start>=$size){
 
 					return FALSE;
 
 				}
+				if(-$start>$size){
 
-				while(FALSE !== ($char=$handler->fgetc())){
+					$start	=	-$size;
 
-					if(!($length===NULL) && ++$count>$length){
+				}
 
-						break;
+				if(($start<0&&$length<0)){ 
+
+					if($length == $start){
+
+						return "";
 
 					}
+
+					if($start > $length){
+
+						return "";
+
+					}
+
+
+					$length	=	(-$start - -$length);
+
+
+				}
+
+				if($start<0&&-$start>$size){
+
+					$start	=	0;
+
+				}
+
+				if($start > 0 && $length<0){
+
+					$length	=	-$length;
+
+				}
+
+				$count	=	0;
+
+				$length	=	$length<0	?	$length*-1	:	$length;
+
+				if($start<0){
+
+					$start	=	($start*-1)>=$size	?	0	:	$start;
+
+				}
+
+				$handler	=	$this->rHandler;
+				$handler->fseekChar($start);
+
+				while(FALSE !== ($char=$handler->fgetChar())&&$count++<$length){
 
 					$substrHandler->fwrite($char);
 
@@ -277,6 +291,7 @@
 
 				$needle		=	$parameters->demand('needle')->valueOf();
 				$offset		=	$parameters->find('offset',0)->valueOf();
+				$ftell		=	$this->rHandler->ftell();
 
 				if($offset<0){
 
@@ -284,8 +299,10 @@
 
 				}
 
-				$handler		=	$this->file->getHandler();
-				$handler->fseek($offset);
+				$handler		=	$this->rHandler;
+
+				$handler->fseek(0);
+				$handler->fseekChar($offset);
 
 				if($handler->eof()){
 
@@ -302,7 +319,7 @@
 
 				$needle	=	StringUtil::substr($needle,['start'=>0,'end'=>1]);
 
-				while(FALSE !== ($str=$handler->fgetc())){
+				while(FALSE !== ($str=$handler->fgetChar())){
 
 					if($str==$needle){
 						$found	=	TRUE;
@@ -313,6 +330,8 @@
 
 				}
 
+				$this->rHandler->fseek($ftell);
+
 				return $found	?	$count	:	FALSE;
 
 			}
@@ -320,12 +339,12 @@
 			public function strrpos($needle){
 
 				$needle	=	VarUtil::printVar($needle);
-				$handler	=	$this->file->getHandler();
+				$handler	=	$this->rHandler;
 
 				$needle	=	StringUtil::substr($needle,['start'=>0,'end'=>1]);
 				$handler->fseek(0);
 
-				while(FALSE!==($char=$handler->fgetc())){
+				while(FALSE!==($char=$handler->fgetChar())){
 
 					if($needle==$char){
 
