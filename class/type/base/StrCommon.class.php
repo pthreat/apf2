@@ -263,7 +263,7 @@
 
 			public function __toString(){
 
-				return $this->value;
+				return sprintf("%s",$this->value);
 
 			}
 

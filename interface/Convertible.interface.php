@@ -8,9 +8,9 @@
 		use apf\iface\convertible\Boolean;
 		use apf\iface\convertible\Str;
 		use apf\iface\convertible\Vector;
-		use apf\iface\convertible\JSON;
+		use apf\iface\convertible\Json;
 
-		interface Convertible extends Str,IntNum,Char,Vector,Boolean,RealNum,JSON{
+		interface Convertible extends Str,IntNum,Char,Vector,Boolean,RealNum,Json{
 
 		}
 

@@ -46,6 +46,7 @@
 
 		use apf\type\custom\Parameter				as	ParameterType;
 		use apf\type\parser\Parameter				as	ParameterParser;
+		use apf\io\File;
 
 		class Log implements \apf\iface\Log{
 
@@ -130,13 +131,6 @@
 			private $append = NULL;
 
 			/**
-			* @var $lineCharacter it's the character that outputs at the end of a message, by default it's \n
-			* @see Log::setCarriageReturnChar
-			*/
-
-			private	$lineCharacter	=	"\n";	
-
-			/**
 			*@var integer $logLevel
 			*
 			*This is a variable useful for filtering log messages through log levels
@@ -180,7 +174,13 @@
 
 			public function setFile($file){
 
-				$this->file = new File($file);
+				if(!($file instanceof File)){
+
+					$file	=	new File($file);
+
+				}
+
+				$this->file =	$file;
 
 			}
 
@@ -198,18 +198,6 @@
 			public function useLogDate($boolean=TRUE){
 
 					$this->useLogDate = $boolean;
-
-			}
-
-			public function setNoLf(){
-
-				$this->lineCharacter	=	'';
-
-			}
-
-			public function setLf(){
-
-				$this->lineCharacter	=	"\n";
 
 			}
 
@@ -231,6 +219,37 @@
 				$this->setPrepend('');
 				$this->log(sprintf("%s\n",str_repeat($char,$length)),0,$color);
 				$this->setPrepend($prepend);
+
+			}
+
+			public static function getInstance($parameters=NULL){
+
+				$instance	=	new static();
+				$parameters	=	ParameterParser::parse($parameters);
+
+				if($parameters->find('stdout',NULL)->toBoolean()->valueOf()){
+
+					$this->setEcho(TRUE);
+
+				}
+
+				$logFile	=	$parameters->find('logfile',NULL)->toString()->valueOf();
+
+				if(!empty($logFile)){
+
+					$this->setFile($logFile);
+
+				}
+
+				$prepend	=	$parameters->find('prepend',NULL)->toString()->valueOf();
+
+				if(strlen($prepend)){
+
+					$this->setPrepend($prepend);
+
+				}
+
+				return $instance;
 
 			}
 
@@ -257,7 +276,7 @@
 
 				if(!is_null($this->logLevel)){
 
-					$level		=	$parameters->find('level',NULL)->valueOf();
+					$level		=	$parameters->findOneOf('level',NULL)->valueOf();
 
 					if(is_null($level)){
 
@@ -332,13 +351,13 @@
 
 					$outputMsg	=	$color	?	$this->colorString($msg,$color)	:	$msg;
 
-					echo sprintf('%s%s',$outputMsg,$this->lineCharacter);
+					echo sprintf('%s%s',$outputMsg,\PHP_EOL);
 	
 				}
 	
 				if(!is_null($this->file)){
 
-					return $this->file->write(sprintf('%s%s',$msg,$this->lineCharacter));
+					return $this->file->getHandler()->fwriteln($msg);
 	
 				}
 			

@@ -64,7 +64,7 @@
 
 					//Attempt to convert to UTF-8
 					//We can't use the string utilities here since they use parameters, thus
-					//it would cause recursion
+					//it would cause recursion.
 
 					$parameters	=	self::stringToUTF8($parameters);
 					$json			=	json_decode($parameters,$asArray=TRUE);

@@ -1,16 +1,16 @@
 <?php
 
-	namespace apf\core{
+	use apf\core\Alias;
 
-		$original	=	sprintf('apf\core\os\%s',php_uname('s'));
-		$alias		=	'apf\core\OS';
+	$platform	=	ucwords(php_uname('s'));
 
-		if(!class_exists($original)){
+	$original	=	sprintf('\apf\core\os\%s',$platform);
+	$alias		=	'apf\core\OS';
 
-			throw new \RuntimeException(sprintf('Unsupported platform %s',php_uname('s')));
+	if(!class_exists($original,$autoload=TRUE)){
 
-		}
-
-		Alias::define($original,$alias);
+		throw new \RuntimeException(sprintf('Unsupported platform %s',php_uname('s')));
 
 	}
+
+	class_alias($original,$alias,$autoload=TRUE);

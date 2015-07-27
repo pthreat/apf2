@@ -53,6 +53,7 @@
 	require	"class/core/OS.class.php";
 
 	require	"class/type/exception/base/vector/ValueNotFound.class.php";
+	require	"class/core/exception/OutOfMemory.class.php";
 
 	require	"class/type/Common.class.php";
 	require	"class/type/base/Boolean.class.php";

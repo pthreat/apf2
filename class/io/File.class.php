@@ -1,14 +1,10 @@
 <?php
 
-	namespace apf\io{
+	namespace apf\io;
+	
+	$os			=	preg_match('/win/i',php_uname('s'))	?	'win'	:	'unix';
+	$original	=	sprintf('\apf\io\os\%s\File',$os);
+	$alias		=	'apf\io\File';
 
-		use apf\core\Alias;
-		use apf\core\OS;
-
-		$original	=	sprintf('apf\io\os\%s\File',OS::getInstance()->getFamily());
-		$alias		=	'apf\io\File';
-
-		Alias::define($original,$alias);
-
-	}
+	class_alias($original,$alias,$autoload=TRUE);
 

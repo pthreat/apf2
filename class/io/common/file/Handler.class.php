@@ -17,6 +17,8 @@
 
 			use \apf\traits\type\parser\Parameter;
 
+			private	$charPosition	=	0;
+
 			public function current(){
 	
 				return StringType::cast(parent::current(),$this->parameters);
@@ -37,6 +39,12 @@
 
 			}
 
+			public function fgetc(){
+
+				return CharType::cast(parent::fgetc());
+
+			}
+
 			public function fread($bytes=1024){
 
 				if(parent::eof()){
@@ -47,6 +55,12 @@
 
 				$fread	=	parent::fread($bytes);
 				return StringType::cast($fread);
+
+			}
+
+			public function fwriteln($contents=NULL){
+
+				return self::fwrite(sprintf('%s%s',$contents,\PHP_EOL));
 
 			}
 
@@ -72,13 +86,20 @@
 				$seekTo	=	$forwardCursor	?	$pos+strlen($char[0])	:	$pos;
 				$this->fseek($seekTo);
 
+				if($forwardCursor){
+
+					$this->charPosition++;
+
+				}
+
 				return CharType::cast($char[0],['strict'=>TRUE]);
 
 			}
 
 			public function getLength(){
 
-				$pos	=	$this->ftell();
+				$pos		=	$this->ftell();
+				$charPos	=	$this->ftellChar();
 
 				$this->fseek(0);
 				$count	=	0;
@@ -90,6 +111,7 @@
 				}
 
 				$this->fseek($pos);
+				$this->charPosition	=	$charPos;
 
 				return $count;
 
@@ -110,8 +132,6 @@
 
 				}
 
-				$this->fseek(0);
-
 				$parameters	=	ParameterParser::parse($charAmount,'amount');
 				$charAmount	=	$parameters->find('amount')->toInt()->valueOf();
 
@@ -121,7 +141,13 @@
 
 				}
 
-				return;
+				return 0;
+
+			}
+
+			public function ftellChar(){
+
+				return $this->charPosition;
 
 			}
 

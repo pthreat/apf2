@@ -9,12 +9,23 @@
 	$log		=	new Log();
 
 	$string	=	'aあ こんにちはaaakanaa';
-
-	$jpstring		=	'あいうえお';
-	$string	=	'aiueo';
-
+	$string	=	'abcdefghij';
+	$string	.=	chr(30);
 	$log->info("Base string: $string");
 	$str		=	new StrDisk($string);
+
+	$log->info("Clip string FROM 'a' to 'c': %s",$str->clip(['charStart'=>'a','charEnd'=>'c']));
+	$log->info("Clip string FROM 'a' to 'f' but CHOP ends: %s",$str->clip(['charStart'=>'a','charEnd'=>'f','chop'=>TRUE]));
+	$log->info('Cut First (start from 0 to "d" %s)',$str->cutFirst(['delimiter'=>'d']));
+
+	$log->info("Test if control characters work like they should (in this case chr(30)");
+	$char		=	$str->substr($str->strpos(chr(30)))[0]->ord()->valueOf();
+
+	if($char==30){
+		$log->success("YES");
+	}else{
+		$log->error("ERROR!");
+	}
 
 	$offsets	=	[
 						[0,1],
@@ -27,6 +38,7 @@
 						[2,1],
 						[2,2],
 						[3,3],
+						[3,5],
 						[3,2],
 						[-1,3],
 						[-1,10],
@@ -56,8 +68,6 @@
 						[-6],
 						[-7],
 						[-8]
-
-
 	];
 
 	foreach($offsets as $o){
@@ -80,7 +90,7 @@
 			$php	=	substr($string,$start,$length);
 
 			$log->warning("PHP:%s",$php);
-			$log->debug("APF:%s",$apf);
+			$log->debug("APF:%s","$apf");
 
 		}else{
 

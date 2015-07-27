@@ -1,4 +1,6 @@
 <?php
 
 	require "class/core/Kernel.class.php";
-	Kernel::boot();
+	use apf\core\Kernel;
+	$k	=	Kernel::boot(); //Idea inicial
+

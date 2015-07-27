@@ -30,7 +30,7 @@
 				$this->parseParameters($parameters);
 
 				$this->recordSeparator	=	$this->parameters
-				->find('recordSeparator',chr(30))
+				->find('recordSeparator','|')
 				->toChar(['strict'=>TRUE])
 				->valueOf();
 
@@ -63,6 +63,9 @@
 					$this->offsetSet($key,$val);
 
 				}
+
+				echo $this->file->getContents()."\n";
+				$this->handler->fseek(0);
 
 			}
 
@@ -99,6 +102,7 @@
 			public function rewind(){
 
 				$this->offset	=	0;
+				$this->handler->fseekChar(0);
 				$this->handler->fseek(0);
 
 			}
@@ -106,19 +110,14 @@
 			public function current(){
 
 				$record		=	"";
+
 				$currentPos	=	$this->handler->ftell();
 
-				while(FALSE !== ($char=$this->handler->fgetc())){
+				while(FALSE !== ($char=$this->handler->fgetChar())){
 
 					if($char->valueOf()===$this->recordSeparator){
 
-						//get back to the current position
-						//THIS IS WHAT CAUSES TO AN INFINITE LOOP
-						//REVIEW!!!!
-
-						$this->handler->fseek($currentPos);
-
-						$value		=	$this->useSerialize	?	unserialize($record)	:	json_decode($record,$assoc=TRUE);
+						$value		=	json_decode($record,$assoc=TRUE);
 						$this->key	=	substr(key($value),1);
 
 						if(!is_null($this->onGet)){
@@ -128,6 +127,8 @@
 
 						}
 
+						$this->handler->fseek($currentPos);
+
 						return $this->autoCast	?	Type::castAny(array_values($value)[0])	:	array_values($value)[0];
 
 					}
@@ -135,6 +136,8 @@
 					$record	=	sprintf('%s%s',$record,$char);
 
 				}
+
+				$this->handler->fseek($currentPos);
 
 			}
 
@@ -147,15 +150,15 @@
 
 			public function valid(){
 
-				$this->handler->fgetc();
+				$this->handler->fgetChar($forwardCursor=FALSE);
 
 				if($this->handler->eof()){
 
+					$this->handler->fseek(0);
+					$this->handler->fseekChar(0);
 					return FALSE;
 
 				}
-
-				$this->handler->fseek($this->handler->ftell()-1);
 
 				return TRUE;
 
@@ -165,7 +168,7 @@
 
 				if(is_null($offset)){
 
-					$offset	=	$this->offset;
+					$offset	=	(int)$this->offset;
 
 				}
 
@@ -173,12 +176,12 @@
 
 				if($this->useSerialize){
 
-					$this->handler->fwrite(serialize($piece).$this->recordSeparator);
+					$this->handler->fwrite(sprintf('%s%s',serialize($piece),$this->recordSeparator));
 					return;
 
 				}
 
-				$this->handler->fwrite(json_encode($piece).$this->recordSeparator);
+				$this->handler->fwrite(sprintf('%s%s',json_encode($piece),$this->recordSeparator));
 
 				$this->offset++;
 				$this->size++;
@@ -192,7 +195,7 @@
 				$recordSeparator	=	$this->recordSeparator;
 				$record				=	"";
 
-				while(FALSE !== ($char=$this->handler->fgetc())){
+				while(FALSE !== ($char=$this->handler->fgetChar())){
 
 					if($char->valueOf()!==$recordSeparator){
 
@@ -280,31 +283,7 @@
 
 			public function sort($parameters=NULL){
 
-				$size		=	$this->size;
-				$sorted	=	new static();
-
-				for($i=0;$i< $size;$i++){
-
-					foreach($this as $key=>$value){
-					
-						$next	=	$this->next();
-						$nkey	=	$this->key();
-
-						echo $key.'|'.$nkey."\n";
-
-						if($value>$next){
-
-							$sorted[]		=	$value;
-							$this[$key]		=	$next;
-							$this[$nkey]	=	$value;
-
-						}
-
-					}
-
-				}
-
-				return $sorted;
+				throw new \BadMethodCallException("Not implemented");
 
 			}
 
@@ -394,9 +373,10 @@
 
 			public function __toString(){
 
-				$this->file->getHandler()->fseek(0);
+				$this->handler->fseek(0);
+				$this->handler->fseekChar(0);
 
-				return $this->file->getContents()->valueOf();
+				return $this->handler->getContents()->valueOf();
 
 			}
 

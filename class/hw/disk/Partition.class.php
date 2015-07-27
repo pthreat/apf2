@@ -12,7 +12,7 @@
 		use apf\util\convert\meassure\Byte	as	ByteMeassureConverter;
 
 		use apf\iface\convertible\Vector		as	VectorInterface;
-		use apf\iface\convertible\JSON		as	JSONInterface;
+		use apf\iface\convertible\Json		as	JSONInterface;
 
 		class Partition implements VectorInterface,JSONInterface{
 

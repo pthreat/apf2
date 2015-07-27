@@ -14,12 +14,15 @@
 		use apf\type\util\common\Class_							as	ClassUtil;
 		use apf\type\util\common\Variable						as VarUtil;
 
+		use apf\util\convert\meassure\Byte						as	ByteMeassureConverter;
+
 		use apf\iface\type\Convertible							as	ConvertibleInterface;
 
 		use apf\type\exception\base\vector\UndefinedIndex	as	UndefinedIndexException;
 		use apf\type\exception\base\vector\ValueNotFound	as	ValueNotFoundException;
 		use apf\type\exception\base\vector\Locked				as	LockedException;
 		use apf\type\exception\common\Uncastable				as	UncastableException;
+		use apf\core\exception\OutOfMemory						as	OutOfMemoryException;
 
 		class Vector extends VectorCommon{
 
@@ -148,6 +151,12 @@
 
 			}
 
+			public function getMemorySize(){
+
+				return VarUtil::getSize($this);
+
+			}
+
 			public static function instance($parameters=NULL){
 
 				return new static(Array(),$parameters);
@@ -256,6 +265,29 @@
 
 			}
 
+			private function checkMemory(&$item,$parameters=NULL){
+
+				$parameters	=	$this->parseParameters($parameters);
+
+				$memory		=	$parameters->find('maxMemory')->valueOf();
+
+				if($memory){
+
+					$bytes		=	ByteMeassureConverter::convert($memory['amount'],['from'=>$memory['meassure'],'to'=>'byte']);
+
+					$curSize		=	memory_get_usage();
+
+					if($curSize>$bytes){
+	
+						$msg	=	VarUtil::printVar($item);
+						throw new OutOfMemoryException("Out of memory: Tried to add {$msg}");
+
+					}
+
+				}
+
+			}
+
 			/**
 			*Method			:	add
 			*Description	:	Adds an item to this vector
@@ -265,6 +297,30 @@
 			*/
 
 			public function add($item,$parameters=NULL){
+
+				$parameters	=	$this->parseParameters($parameters);
+
+				$this->checkMemory($item,$parameters);
+
+				//We could use memory calculations through the Platform component 
+				//to know if adding the item would "overflow" the allowed PHP memory
+
+				/**
+				*Something like: 
+				*		Platform::hasSufficientMemory($item,['throw'=>TRUE]);
+				*		//This would throw an InsufficientMemory Exception
+				*
+				*/
+
+				$key	=	$parameters->find('key',FALSE)->valueOf();
+
+				$key===FALSE	?	($this[]	=	$item)	:	($this[VarUtil::printVar($key,$parameters)]	=	$item);
+
+				return $this;
+
+			}
+
+			public function addByReference(&$item,$parameters=NULL){
 
 				$parameters	=	ParameterParser::parse($parameters);
 
@@ -477,11 +533,9 @@
 
 				}
 
-				if(is_null($offset)){
+				$offset	=	is_null($offset)	?	count($this->value)	:	VarUtil::printVar($offset);
 
-					$offset	=	count($this->value);
-
-				}
+				$this->checkMemory($value);
 
 				$this->value[$offset]	=	$this->autoCast	?	parent::castAny($value)	:	$value;
 				$this->timesSet++;

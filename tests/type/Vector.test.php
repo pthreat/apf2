@@ -23,25 +23,56 @@
 																					'value'	=>'string'
 																				],
 														],
+														'maxMemory'	=>	[
+																				'amount'		=>'2140',
+																				'meassure'	=>'kilobyte'
+														]
 	]);
 
 	$vector[]	=	1;
 	$vector[]	=	"hello";
+
 	try{
-	$vector[]	=	new stdClass();
+
+		$vector[]	=	new stdClass();
+
 	}catch(\Exception $e){
+
 		$log->emergency($e);
+
 	}
 
-	$vector['key']=1;
-	$vector->add(20);
+	$vector[]	=	"test";
+	echo $vector;
 
 	$vector->pad(10,30);
-	$pop	=	$vector->pop();
 
 	foreach($vector as $k=>$v){
 		echo "$k=>$v"."\n";
 	}
+
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
+	$vector[]='alalalala';
 
 	echo $vector->flip()->hello;
 

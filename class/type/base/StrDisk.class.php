@@ -78,6 +78,68 @@
 
 			}
 
+			public function clip($parameters=NULL){
+
+				$parameters		=	ParameterParser::parse($parameters);
+
+				$charStart		=	CharType::cast($parameters->demand('charStart'));
+				$charEnd			=	CharType::cast($parameters->demand('charEnd'));
+
+				$startOffset	=	$parameters->find('startOffset',NULL)->valueOf();
+				$endOffset		=	$parameters->find('endOffset',NULL)->valueOf();
+
+				if(!is_null($startOffset)){
+
+					$startOffset	=	IntType::cast($startOffset);
+
+				}
+
+				if(!is_null($endOffset)){
+
+					$endOffset	=	IntType::cast($endOffset);
+
+				}
+
+				$start		=	$this->strpos(['needle'=>$charStart,'offset'=>$startOffset]);
+				$end			=	is_null($endOffset)	?	$this->strrpos($charEnd)	:	
+																	$this->strpos(['needle'=>$charEnd,'offset'=>$endOffset]);
+
+				if($parameters->find('chop',FALSE)->toBoolean()->valueOf()){
+
+					$start++;
+					$end-=2;
+
+				}
+
+				return $this->substr([
+												'start'	=>	$start,
+												'length'	=>	$end
+				]);
+
+			}
+
+			public function cutFirst($parameters=NULL){
+
+				$parameters	=	ParameterParser::parse($parameters);
+				$delimiter	=	$parameters->demand('delimiter')->toString()->valueOf();
+				$offset		=	$parameters->find('offset',0)->toInt()->valueOf();
+				$pos			=	$this->strpos(['needle'=>$delimiter,'offset'=>$offset]);
+
+				return $this->substr(['start'=>0,'length'=>$pos]);
+
+			}
+
+			public function cutLast($parameters=NULL){
+
+				$parameters	=	ParameterParser::parse($parameters);
+				$delimiter	=	$parameters->demand('delimiter')->toString()->valueOf();
+				$offset		=	$parameters->find('offset',0)->toInt()->valueOf();
+				$pos			=	$this->strpos(['needle'=>$delimiter,'offset'=>$offset]);
+
+				return $this->substr(['start'=>$pos]);
+
+			}
+
 			public function offsetSet($offset,$value){
 
 				$offset	=	!is_null($offset) ? (int)$offset : ($this->strlen() + 1);
@@ -187,6 +249,7 @@
 			public function substr($parameters=NULL){
 
 				$pos			=	$this->rHandler->ftell();
+				$charPos		=	$this->rHandler->ftellChar();
 
 				$parameters	=	ParameterParser::parse($parameters,'start');
 				$parameters->findInsert('length',NULL);
@@ -222,6 +285,7 @@
 					return FALSE;
 
 				}
+
 				if(-$start>$size){
 
 					$start	=	-$size;
@@ -232,19 +296,17 @@
 
 					if($length == $start){
 
-						return "";
+						return CharType::instance($parameters);
 
 					}
 
 					if($start > $length){
 
-						return "";
+						return CharType::instance();
 
 					}
 
-
 					$length	=	(-$start - -$length);
-
 
 				}
 
@@ -271,6 +333,8 @@
 				}
 
 				$handler	=	$this->rHandler;
+				$handler->fseek(0);
+				$handler->fseekChar(0);
 				$handler->fseekChar($start);
 
 				while(FALSE !== ($char=$handler->fgetChar())&&$count++<$length){
@@ -280,6 +344,7 @@
 				}
 
 				$substrHandler->fseek(0);
+				$handler->fseekChar($charPos);
 
 				return new static($substr);
 
@@ -292,6 +357,7 @@
 				$needle		=	$parameters->demand('needle')->valueOf();
 				$offset		=	$parameters->find('offset',0)->valueOf();
 				$ftell		=	$this->rHandler->ftell();
+				$ftellChar	=	$this->rHandler->ftellChar();
 
 				if($offset<0){
 
@@ -302,7 +368,7 @@
 				$handler		=	$this->rHandler;
 
 				$handler->fseek(0);
-				$handler->fseekChar($offset);
+				$handler->fseekChar(0);
 
 				if($handler->eof()){
 
@@ -331,6 +397,7 @@
 				}
 
 				$this->rHandler->fseek($ftell);
+				$this->rHandler->fseekChar($ftellChar);
 
 				return $found	?	$count	:	FALSE;
 
@@ -340,15 +407,18 @@
 
 				$needle	=	VarUtil::printVar($needle);
 				$handler	=	$this->rHandler;
+				$found	=	FALSE;
 
 				$needle	=	StringUtil::substr($needle,['start'=>0,'end'=>1]);
 				$handler->fseek(0);
+				$handler->fseekChar(0);
+				$count	=	0;
 
 				while(FALSE!==($char=$handler->fgetChar())){
 
 					if($needle==$char){
 
-						$found=$handler->ftell()-1;
+						$found=$handler->ftellChar();
 
 					}
 

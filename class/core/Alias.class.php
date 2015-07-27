@@ -14,9 +14,15 @@
 
 			public static function define($original,$alias){
 
-				class_alias($original,$alias);
+				class_alias($original,$alias,$autoload=TRUE);
 				self::$aliases[$alias]	=	$original;
 
+			}
+
+			public static function getList(){
+
+				return self::$aliases;
+				
 			}
 
 		}

@@ -84,6 +84,27 @@
 
 			}
 
+			public function findParametersBeginningWith($str){
+
+				$str					=	preg_quote(VarUtil::printVar($str),'/');
+				$parametersLike	=	VectorType::instance();
+				$values				=	$this->getValue();
+
+				foreach($values as $item){
+
+					if(preg_match("/^$str/",strtolower((string)$item->getName()))){
+
+						$name	=	StringType::cast($item->getName())->substr(0,strlen($str));
+						$parametersLike[$name]	=	$item->getValue();
+
+					}
+
+				}
+
+				return ParameterParser::parse($parametersLike);
+
+			}
+
 			public function add(ParameterType $item){
 
 				$this->value[]	=	$item;
