@@ -2,6 +2,8 @@
 
 	namespace apf\core{
 
+		require "class/core/AutoLoad.class.php";
+
 		use apf\core\OS;
 		use apf\core\cache\adapter\File						as	FileCache;
 		use apf\type\validate\base\Vector					as	ValidateVector;
@@ -30,112 +32,120 @@
 
 		});
 
-
 		class Kernel{
 
 			/**
-			*@var String $apfDir
-			*This variable contains the FULL PATH where the framework resides
-			*/
+			 *@var Kernel $instance
+			 *Kernel instance (Singleton pattern)
+			 */
 
-			private	static $apfDir		=	NULL;
-
-
-			/**
-			*@var String $appDir
-			*Full path to your project directory
-			*For instance, /home/your_user/your_project/
-			*/
-
-			private	$appDir		=	NULL;
-
+			private	static	$instance	=	NULL;
 
 			/**
-			*@var String $sapi
-			*This variable contains the SAPI being used
-			*It'll be CLI for Command line interface or anything else for web
-			*such as apache2handler in case you're running an Apache web server
+			*@var ParameterCollection
+			*Kernel parameters
 			*/
 
-			private	$sapi			=	NULL;
+			private	$parameters	=	NULL;
 
 			/**
-			*@var Array
-			*/
-			private	static $loadedClasses	=	Array();
+			 *@var String $apfDir
+			 *This variable contains the FULL PATH where the framework resides
+			 */
+
+			private $apfDir					=	NULL;
 
 			/**
-			*@var apf\core\Log $log
-			*Used for logging kernel messages
-			*/
+			 *@var String $appDir
+			 *Full path to your project directory
+			 *For instance, /home/your_user/your_project/
+			 */
+
+			private	static	$appDir		=	NULL;
+
+			/**
+			 *@var String $sapi
+			 *This variable contains the SAPI being used
+			 *It'll be CLI for Command line interface or anything else for web
+			 *such as apache2handler in case you're running an Apache web server
+			 */
+
+			private	static	$sapi			=	NULL;
+
+			/**
+			 *@var apf\core\Log $log
+			 *Used for logging kernel messages
+			 */
 
 			private	$log;
 
 			/**
-			*@var int $logLevel
-			*Log level: 1 = Normal, 2 = Verbose, 3 = Very verbose
-			*/
+			 *@var int $logLevel
+			 *Log level: 1 = Normal, 2 = Verbose, 3 = Very verbose
+			 */
 
-			private	$logLevel	=	1;
+			private	$logLevel				=	1;
 
 			/**
-			*@var File $logFile
-			*This variable is used to store kernel messages during process stage 0
-			*at this stage the kernel does not know anything about your app configuration.
-			*/
+			 *@var File $logFile
+			 *This variable is used to store kernel messages during process stage 0
+			 *at this stage the kernel does not know anything about your app configuration.
+			 */
 
 			private	$logFile;
 
 			/**
-			*Indicates in which process stage the kernel is at
-			*@var Int $stage
-			*/
+			 *Indicates in which process stage the kernel is at
+			 *@var Int $stage
+			 */
 
 			private	$stage = 0;
 
 			/**
-			*@var String Framework version
-			*/
+			 *@var String Framework version
+			 */
 
 			const	VERSIONNUM	=	'0.2';
 
 			/**
-			*@var String Framework version string
-			*/
+			 *@var String Framework version string
+			 */
 
 			const VERSIONSTR	=	'Veritas';
 
 			private function __construct($parameters=NULL){
 
-				spl_autoload_register(function($class,$kernel) use ($this){
+				self::$instance	=	$this;
 
-					$kernel->autoLoad($class);
+				AutoLoad::getInstance()->onNamespaceMatch('^apf',function($class){
+
+					return self::$instance->loadClass($class);
 
 				});
 
-				$this->parseParameters($parameters);
+				$this->parameters	=	ParameterParser::parse($parameters);
+				$this->log(sprintf('APF Kernel start; Version %s',self::getFullVersion()),'info',1);
 
-				$parameters	=	$this->parameters;
+				$os	=	OS::getInstance();
+				
+				$autoloadedClasses	=	AutoLoad::getInstance()->getLoadedClasses();
 
-				try{
+				if(sizeof($autoloadedClasses)){
 
-					$this->log(sprintf('APF Kernel start; Version %s',self::getFullVersion()),'info');
+					foreach($autoloadedClasses as $loadedClass){
 
-				}catch(\Exception $e){
+						$this->log("Loaded class: \"$loadedClass[class]\" from file: \"$loadedClass[file]\"","debug",3);
 
-					throw new \RunTimeException($e->getMessage());
+					}
 
 				}
 
-				$os	=	OS::getInstance();
+				$this->log($os->cpuInfo(),'info',1);
+				$this->log($os->memInfo(),'info',1);
+				$this->log($os->partition('/'),'info',1);
 
-				$this->log($os->cpuInfo(),'info');
-				$this->log($os->memInfo(),'info');
-				$this->log($os->partition('/'),'info');
+				$config	=	VarUtil::printVar($this->parameters->find('config',$this->getDefaultConfigFile())->valueOf());
 
-				$config	=	VarUtil::printVar($parameters->find('config',$this->getDefaultConfigFile())->valueOf());
-
-				echo $config;
 				die();
 
 				try{
@@ -162,10 +172,21 @@
 
 			}
 
-			public static function boot($parameters=NULL){
+			public static function boot($parameters){
 
-				$instance	=	new static($parameters);
+				return self::getInstance($parameters);
 
+			}
+
+			private static function getInstance($parameters=NULL){
+
+				if(!is_null(self::$instance)){
+
+					return self::$instance;
+
+				}
+
+				return new static($parameters);
 
 			}
 
@@ -175,22 +196,22 @@
 
 			}
 
-			public static function getAPFDir(){
+			public function getAPFDir(){
 
-				if(is_null(self::$apfDir)){
+				if(is_null($this->apfDir)){
 
-					self::$apfDir	=	substr(dirname(__FILE__),0,strrpos(dirname(__FILE__),'class'));
-					self::$apfDir	=	rtrim(self::$apfDir,DIRECTORY_SEPARATOR);
+					$this->apfDir	=	substr(dirname(__FILE__),0,strrpos(dirname(__FILE__),'class'));
+					$this->apfDir	=	rtrim($this->apfDir,DIRECTORY_SEPARATOR);
 
 				}
 
-				return self::$apfDir;
+				return $this->apfDir;
 
 			}
 
 			private function getDefaultModulesDir(){
 
-				return sprintf('%s%smodules',self::getDefaultAppDir(),self::$ds);
+				return sprintf('%s%smodules',$this->getDefaultAppDir(),self::$ds);
 
 			}
 
@@ -201,7 +222,7 @@
 
 			}
 
-			public static function log($message,$type){
+			public function log($message,$type,$level){
 
 				static $switchState = 0;
 
@@ -212,8 +233,8 @@
 						if(is_null($this->log)){
 
 							$logParams	=	$this->parameters->findParametersBeginningWith('log');
+							$logParams->replace('prepend',sprintf('[Kernel][Stage %s]',$this->stage));
 							$this->log	=	Log::getInstance($logParams);
-							$this->log->setPrepend(sprintf('[Kernel][Stage %s]',$this->stage));
 
 						}
 
@@ -236,12 +257,12 @@
 
 							try{
 
-								self::$log(sprintf('Creating log directory "%s"',$objDir));
+								$this->log(sprintf('Creating log directory "%s"',$objDir));
 								$objDir->create();
 
 							}catch(DirectoryExistsException $e){
 
-								self::log($e->getMessage(),'info');
+								$this->log($e->getMessage(),'info');
 
 							}catch(\Exception $e){
 
@@ -253,110 +274,21 @@
 
 				}
 
-				return self::$log->$type($message,$this->parameters);
+				$this->log->$type($message,['level'=>$level]);
 
 			}
 
 			//Notify the kernel of a certain event
-				
+
 			public function tell($value,$message){
 
-				return self::$log(sprintf('%s : %s',gettype($value)));
+				return $this->log(sprintf('%s : %s',gettype($value)));
 
 			}
 
 			private function getDefaultLogDir(){
 
-				return sprintf('%s%slog',self::getDefaultAppDir(),self::$ds);
-
-			}
-
-			private function setupPHP(){
-
-				if(!isset(DI::get("apf")->framework)){
-
-					throw new \Exception("Invalid configuration file, no [framework] section was found");
-
-				}
-
-				$cfg		=	&DI::get("apf")->framework;
-
-				if(empty($cfg->modules)){
-
-					$cfg->modules	=	self::getDefaultModulesDir();
-
-					if(!is_dir($cfg->modules)){
-
-						throw new DirectoryNotFoundException();
-
-					}
-
-				}
-
-				if(OS::isWindows()&& !empty($cfg->win_locale)){
-
-					$locale	=	$cfg->win_locale;
-					$locale	=	empty($locale)	?	'english'	:	$locale;
-
-					if(setlocale(LC_ALL,$locale)===FALSE){
-
-						throw new \Exception("Invalid windows locale specified in configuration");
-
-					}
-
-				}
-
-				if(!Platform::isWindows() && !empty($cfg->locale)) {
-
-					$locale	=	$cfg->locale;
-					$locale	=	empty($locale)	?	'en_US.utf8'	:	$locale;
-
-					if (setlocale(LC_ALL,$locale) === FALSE) {
-
-						$msg	=	"Invalid locale specified, it doesn't seems to be installed on your system";
-						throw new \Exception($msg);
-
-					}
-
-				}
-
-				if(isset($cfg->dev_mode)&&(int)$cfg->dev_mode>0){
-
-					ini_set("display_errors","On");
-					error_reporting(E_ALL);
-
-				}
-
-				//This should be in \apf\web\core\Kernel
-				if(!self::isCli()&&isset($cfg->auto_session)){
-
-					session_start();
-
-				}
-
-				if(!self::isCli()&&isset($cfg->headers)){
-
-					header($cfg->headers);
-
-				}
-
-				if(isset($cfg->time_limit)){
-
-					set_time_limit($cfg->time_limit);
-
-				}
-
-				if(isset($cfg->memory_limit)){
-
-					ini_set("memory_limit",$cfg->memory_limit);
-
-				}
-
-				if(isset($cfg->timezone)){
-
-					date_default_timezone_set($cfg->timezone);
-
-				}
+				return sprintf('%s%slog',$this->getDefaultAppDir(),self::$ds);
 
 			}
 
@@ -364,27 +296,22 @@
 
 				$ds	=	DIRECTORY_SEPARATOR;
 
-				return realpath(sprintf('%s%s..%s',self::getAPFDir(),$ds,$ds));
+				return realpath(sprintf('%s%s..%s',$this->getAPFDir(),$ds,$ds));
 
 			}
 
 			private function getDefaultConfigFile(){
 
 				$ds			=	DIRECTORY_SEPARATOR;
-				$vsArgs		=	[self::getDefaultAppDir(),$ds,$ds,$ds];
+				$vsArgs		=	[$this->getDefaultAppDir(),$ds,$ds,$ds];
 				return vsprintf('%s%sapp%sconfig%sapf.ini',$vsArgs);
 
 			}
 
-			/**
-			*Loads a framework class
-			*This method is used internally by the framework's autoloader
-			*/
-
-			private static function loadAPFClass($class){
+			public function loadClass($class){
 
 				$ds		=	DIRECTORY_SEPARATOR;
-				$fwDir	=	self::getAPFDir();
+				$fwDir	=	static::getInstance()->getAPFDir();
 
 				$class	=	preg_replace(sprintf('/%s%s/','\\','\\'),$ds,$class);
 
@@ -409,68 +336,14 @@
 					default:
 						$type	=	'class';
 					break;
-					
+
 				}
 
 				//$class	=	ucwords(strtolower(basename($class)));
 				$vsArgs	=	[$fwDir,$ds,$type,$ds,$class,$type];
 				$path		=	vsprintf("%s%s%s%s%s.%s.php",$vsArgs);
 
-				self::$log('debug',"Load: $path",3);
-
-				if(!file_exists($path)){
-
-					throw new \RuntimeException("Class \"$class\" not found in \"$path\"");
-
-				}
-
-				require_once $path;
-
-				self::addLoadedClass($class,$path);
-
-			}
-
-			private static function autoLoad($class){
-
-				if(self::isAPFClass($class)){
-
-					return self::loadAPFClass($class);
-
-				}
-
-				//Load other classes
-
-			}
-
-			private static function addLoadedClass($class,$file,$type="framework"){
-
-				if(!array_key_exists($type,self::$loadedClasses)){
-
-					self::$loadedClasses[$type]		= Array();
-
-				}
-
-				$loadedClasses	=	&self::$loadedClasses[$type];
-
-				self::$loadedClasses[$type][]		= Array(
-																		"class"		=>	$class,
-																		"file"		=>	$file
-				);
-
-			}
-
-			public static function isLoadedClass($class,$type){
-			}
-
-			private static function getLoadedClasses(){
-
-				return array_keys(self::$loadedFrameworkClasses);
-
-			}
-
-			private static function isAPFClass($class){
-
-				return strtolower(substr($class,0,strpos($class,'\\'))) == 'apf';
+				return $path;
 
 			}
 
@@ -505,8 +378,8 @@
 			}
 
 			/*****************************************************
-			* Logging methods
-			******************************************************/
+			 * Logging methods
+			 ******************************************************/
 
 			public function error($message,$value=NULL){
 			}

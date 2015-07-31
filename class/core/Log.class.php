@@ -48,31 +48,9 @@
 		use apf\type\parser\Parameter				as	ParameterParser;
 		use apf\io\File;
 
+		use apf\console\type\ansi\Colorize		as	ANSIColor;
+
 		class Log implements \apf\iface\Log{
-
-			/**
-			 * @var $colors Array Different colors for console output
-			 */
-
-			private $colors = Array(
-											"black"		=>"\33[0;30m",
-											"blue"		=>"\33[0;34m",
-											"lblue"		=>"\33[1;34m",
-											"green"		=>"\33[0;32m",
-											"lgreen"		=>"\33[1;32m",
-											"cyan"		=>"\33[0;36m",
-											"lcyan"		=>"\33[1;36m",
-											"red"			=>"\33[0;31m",
-											"lred"		=>"\33[0;31m",
-											"purple"		=>"\33[0;35m",
-											"lpurple"	=>"\33[1;35m",
-											"brown"		=>"\33[0;33m",
-											"gray"		=>"\33[1;30m",
-											"lgray"		=>"\33[0;37m",
-											"yellow"		=>"\33[1;33m",
-											"white"		=>"\33[1;37m"
-			);
-
 
 			/**
 			 * @var $uselogDate
@@ -229,7 +207,7 @@
 
 				if($parameters->find('stdout',NULL)->toBoolean()->valueOf()){
 
-					$this->setEcho(TRUE);
+					$instance->setEcho(TRUE);
 
 				}
 
@@ -237,7 +215,7 @@
 
 				if(!empty($logFile)){
 
-					$this->setFile($logFile);
+					$instance->setFile($logFile);
 
 				}
 
@@ -245,7 +223,13 @@
 
 				if(strlen($prepend)){
 
-					$this->setPrepend($prepend);
+					$instance->setPrepend($prepend);
+
+				}
+
+				if(!is_null($parameters->find('level',NULL)->valueOf())){
+
+					$instance->setLogLevel($parameters->find('level')->toInt()->valueOf());
 
 				}
 
@@ -276,7 +260,7 @@
 
 				if(!is_null($this->logLevel)){
 
-					$level		=	$parameters->findOneOf('level',NULL)->valueOf();
+					$level	=	$parameters->findOneOf('level',NULL)->valueOf();
 
 					if(is_null($level)){
 
@@ -286,7 +270,7 @@
 
 					$level	=	IntType::cast($level)->valueOf();
 
-					if($this->logLevel!==$level){
+					if($level > $this->logLevel){
 
 						return;
 
@@ -349,7 +333,7 @@
 	
 				if($this->echo){
 
-					$outputMsg	=	$color	?	$this->colorString($msg,$color)	:	$msg;
+					$outputMsg	=	$color	?	ANSIColor::text($msg,$color)	:	$msg;
 
 					echo sprintf('%s%s',$outputMsg,\PHP_EOL);
 	
@@ -363,25 +347,6 @@
 			
 			}
 
-			private function colorString($string,$color){
-
-				if(!in_array($color,array_keys($this->colors))){
-
-					throw new \Exception("No such color: $color");
-
-				}
-
-				return sprintf('%s%s%s',$this->colors[$color],$string,"\033[37m");
-
-			}
-
-			public function reset(){
-
-				echo $this->colors["lgray"]."\r";
-
-			}
-	
-	
 			/**
 			*Returns an X11 debug like tag according to the given number
 			*/

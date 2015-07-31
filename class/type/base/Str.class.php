@@ -404,9 +404,9 @@
 			/*Array access interface methods
 			*******************************************/
 
-			public function substr($start,$length){
+			public function substr($start,$length=NULL){
 
-				return new static(StringUtil::substr($this->value,$start,$length));
+				return new static(StringUtil::substr($this->value,['start'=>$start,'end'=>$length]));
 
 			}
 

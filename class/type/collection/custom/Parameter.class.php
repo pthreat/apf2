@@ -7,6 +7,7 @@
 		use apf\type\base\Vector									as	VectorType;
 		use apf\type\base\IntNum									as	IntType;
 		use apf\type\base\RealNum									as	RealNum;
+		use apf\type\util\base\Str									as	StringUtil;
 
 		use apf\type\custom\Parameter								as	ParameterType;
 
@@ -86,22 +87,24 @@
 
 			public function findParametersBeginningWith($str){
 
-				$str					=	preg_quote(VarUtil::printVar($str),'/');
-				$parametersLike	=	VectorType::instance();
+				$parametersLike	=	new static();
 				$values				=	$this->getValue();
 
 				foreach($values as $item){
 
-					if(preg_match("/^$str/",strtolower((string)$item->getName()))){
+					$name	=	StringUtil::substr($item->getName(),['start'=>0,'end'=>StringUtil::length($str)]);
 
-						$name	=	StringType::cast($item->getName())->substr(0,strlen($str));
-						$parametersLike[$name]	=	$item->getValue();
+					if($name==$str){
+
+						$name	=	StringType::cast($item->getName())->substr(strlen($str));
+						$item->setName($name);
+						$parametersLike->add($item);
 
 					}
 
 				}
 
-				return ParameterParser::parse($parametersLike);
+				return $parametersLike;
 
 			}
 
