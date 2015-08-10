@@ -151,6 +151,34 @@
 
 			}
 
+			public function filterInclude($regex){
+
+				foreach($this as $k=>$v){
+
+					if(StringUtil::match($v,["match"=>$regex])){
+						unset($this[$k]);
+					}
+
+				}
+
+				return $this;
+
+			}
+
+			public function filterExclude($regex){
+
+				foreach($this as $k=>$v){
+
+					if(!StringUtil::match($v,["match"=>$regex])){
+						unset($this[$k]);
+					}
+
+				}
+
+				return $this;
+
+			}
+
 			public function getMemorySize(){
 
 				return VarUtil::getSize($this);

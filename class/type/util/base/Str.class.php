@@ -24,6 +24,12 @@
 
 		class Str{
 
+			public static function normalizeCarriageReturns($str){
+
+				return self::replace($str,["pattern"=>"/\r\n/","replacement"=>"\n"]);
+
+			}
+
 			public static function convert($string,$parameters=NULL){
 
 				$parameters	=	ParameterParser::parse($parameters);
@@ -46,6 +52,34 @@
 				}
 
 				return $conversion;
+
+			}
+
+			public static function onMatch($str,$pattern,Callable $callable){
+			
+				if(!self::match($str,['match'=>$pattern])){
+
+					return NULL;
+
+				}
+
+				return $callable($str);
+	
+			}
+
+			public static function forEachLine($str,Callable $callable){
+	
+				$str			=	VarUtil::printVar($str);
+				$parameters	=	Array('replacement'=>"\n",'pattern'=>"\r\n",'quoteRegex'=>FALSE);
+				$str			=	explode("\n",self::replace($str,$parameters));
+
+				foreach($str as &$s){
+
+					$callable($s);
+
+				}
+
+				return $str;
 
 			}
 

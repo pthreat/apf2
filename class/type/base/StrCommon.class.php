@@ -3,10 +3,59 @@
 	namespace apf\type\base{
 
 		use apf\type\Common;
+		use apf\type\base\Vector						as	VectorType;
 		use apf\type\util\base\Str						as	StringUtil;
 		use apf\type\validate\base\Str				as	ValidateString;
 
 		abstract class StrCommon extends Common{
+
+			public function filterLinesContaining($regex){
+				
+				$vector			=	VectorType::cast(explode("\n",$this->value));
+				$vector->filterInclude($regex);
+				$this->value	=	$vector->toString()->valueOf();
+				return $this;
+
+			}
+
+			public function filterLinesNotContaining($regex){
+
+				$vector			=	VectorType::cast(explode("\n",$this->value))->filterExclude($regex);
+				$this->value	=	$vector->toString()->valueOf();
+				return $this;
+
+			}
+
+			public function normalizeCarriageReturns(){
+
+				$this->value	=	StringUtil::normalizeCarriageReturns($this->value);
+				return $this;
+
+			}
+
+			public function onMatch($pattern,Callable $callable){
+
+				if(!is_null(StringUtil::onMatch($this->value,$pattern,$callable))){
+
+					$this->value	=	$callable($this->value);
+
+				}
+
+				return $this;
+
+			}
+
+			public function onMismatch($pattern,Callable $callable){
+
+				if(is_null(StringUtil::onMatch($this->value,$pattern,$callable))){
+
+					$this->value	=	$callable($this->value);
+
+				}
+
+				return $this;
+
+			}
 
 			public function isUppercase(){
 
